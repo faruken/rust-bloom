@@ -4,7 +4,7 @@
 
 # rust-bloom
 
-rust-bloom is a bloom filter implementation in rust.
+rust-bloom is a bloom filter implementation in rust that uses farmhash.
 
 
 ### Example Usage
