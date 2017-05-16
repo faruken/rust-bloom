@@ -1,0 +1,15 @@
+[package]
+name = "rust-bloom"
+version = "0.0.1"
+authors = ["faruken"]
+description = "A simple bloom filter implementation that uses farmhash"
+repository = "https://github.com/faruken/rust-bloom"
+license = "MIT"
+
+[lib]
+name="bloom"
+path="src/bloom/mod.rs"
+
+[dependencies]
+bit-vec = "0.4.3"
+farmhash = "1.1.5"
