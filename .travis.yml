@@ -17,5 +17,4 @@ addons:
       - libelf-dev
       - libdw-dev
 after_success:
-  - |
-    travis-cargo --only stable coveralls --no-sudo
+  - travis-cargo --only stable coveralls --no-sudo
