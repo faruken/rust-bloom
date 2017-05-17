@@ -25,3 +25,9 @@ rust-bloom is a bloom filter implementation in rust that uses farmhash.
     }
 
 
+### Use Cases
+
+- If you're writing a spider, you can do "have I discovered this URL" efficiently.
+- It's also how "this username is already taken" works on high traffic websites. 
+
+Note that there can be false positives.
