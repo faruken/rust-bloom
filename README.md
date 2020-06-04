@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/faruken/rust-bloom.svg?branch=master)](https://travis-ci.org/faruken/rust-bloom)
-![](https://img.shields.io/badge/rustc-1.19.0--nightly-lightgrey.svg)
+![](https://img.shields.io/badge/rustc-1.45.0--nightly-lightgrey.svg)
 ![](https://img.shields.io/badge/License-MIT-blue.svg)
 
 # rust-bloom

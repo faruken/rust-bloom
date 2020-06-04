@@ -1,15 +1,13 @@
-extern crate bit_vec;
 extern crate farmhash;
 
 use std::default::Default;
-use std::f64::consts;
-use bit_vec::BitVec;
-use farmhash::hash64;
+use farmhash::FarmHasher;
+use std::hash::{Hash, Hasher};
 
 
-pub struct BloomFilter {
-    bv: BitVec,
-    hashes: usize
+struct BloomFilter {
+    bv: Vec<bool>,
+    hashes: u64,
 }
 
 
@@ -23,8 +21,9 @@ impl Default for BloomFilter {
 
 
 impl BloomFilter {
-    pub fn new(capacity: usize, error_rate: f64) -> BloomFilter {
+    pub fn new(capacity: usize, error_rate: f64) -> Self {
         assert!((error_rate > 0.0 && error_rate < 1.0) && capacity > 0);
+        let bv = vec![false; capacity];
 
         // https://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives
         let m = BloomFilter::num_of_bits_in_vec(capacity, error_rate);
@@ -33,32 +32,38 @@ impl BloomFilter {
         let k = BloomFilter::num_of_hash_funcs(m, capacity);
 
         BloomFilter {
-            bv: BitVec::from_elem(capacity, false),
-            hashes: k
+            bv,
+            hashes: k,
         }
     }
-
+    
+    #[inline]
     fn num_of_bits_in_vec(capacity: usize, error_rate: f64) -> usize {
-        (-1.0 * (((capacity as f64) * error_rate.ln()) / (1.0 / consts::LN_2.powf(2.0)).ln())).ceil() as usize
+        (-1.0 * (((capacity as f64) * error_rate.ln()) /
+            (1.0 / std::f64::consts::LN_2.powf(2.0)).ln())).ceil() as usize
     }
 
-    fn num_of_hash_funcs(m: usize, capacity: usize) -> usize {
-        (consts::LN_2 * ((m as f64) / (capacity as f64))).round().abs() as usize
+    #[inline]
+    fn num_of_hash_funcs(m: usize, capacity: usize) -> u64 {
+        (std::f64::consts::LN_2 * ((m as f64) / (capacity as f64))).round().abs() as u64
     }
 
-    pub fn insert(&mut self, value: &str) {
+    fn nth_hash<T>(&self, x: T, m: u64) -> usize where T: Hash {
+        let mut hasher = FarmHasher::default();
+        hasher.write(&m.to_be_bytes());
+        x.hash(&mut hasher);
+        ((hasher.finish()) % (self.bv.capacity() as u64)) as usize
+    }
+
+    pub fn insert<T>(&mut self, value: T) -> bool where T: Hash {
         for i in 0..self.hashes {
             let index = self.nth_hash(&value, i);
-            self.bv.set(index, true);
+            self.bv[index] = true;
         }
+        true
     }
 
-    fn nth_hash(&self, x: &str, m: usize) -> usize {
-        let hashval = x.to_string() + &m.to_string(); // meh
-        (hash64(&hashval.as_bytes()) % (self.bv.capacity() as u64)) as usize
-    }
-
-    pub fn has(&self, value: &str) -> bool {
+    pub fn has<T>(&self, value: T) -> bool where T: Hash {
         for i in 0..self.hashes {
             let index = self.nth_hash(&value, i);
             if !self.bv[index] {
