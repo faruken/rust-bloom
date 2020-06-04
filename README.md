@@ -9,21 +9,23 @@ rust-bloom is a bloom filter implementation in rust that uses farmhash.
 
 ### Example Usage
 
-    extern crate bloom;
+```rust
 
-    use bloom::BloomFilter;
+extern crate bloom;
 
-    fn main() {
-        let mut bf = BloomFilter::new(10_000, 0.02);
-        bf.insert(&"hello");
-        bf.insert(&"abcd");
-        
-        match bf.has(&"hello") {
-            true => println!("exists"),
-            _ => println!("not exists"),
-        }
+use bloom::BloomFilter;
+
+fn main() {
+    let mut bf = BloomFilter::new(10_000, 0.02);
+    bf.insert(&"hello");
+    bf.insert(&"abcd");
+
+    match bf.has(&"hello") {
+        true => println!("exists"),
+        _ => println!("not exists"),
     }
-
+}
+```
 
 ### Use Cases
 
